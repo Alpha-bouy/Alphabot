@@ -1,0 +1,71 @@
+## render.yaml — Polymarket Cricket Bot deployment on Render.com
+## Repo: push your code to GitHub, connect repo in Render dashboard
+## Service type: Background Worker (24/7, no HTTP requirement)
+
+services:
+  - type: worker
+    name: polymarket-cricket-bot
+    runtime: python
+    plan: free
+
+    buildCommand: pip install -r requirements.txt
+
+    startCommand: python main.py
+
+    envVars:
+      # ── Set these in Render dashboard → Environment tab ──────────────────
+      - key: PRIVATE_KEY
+        sync: false   # Set manually in Render (never commit to git!)
+
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+
+      - key: CRICKET_DATA_API_KEY
+        sync: false
+
+      - key: CLOB_API_KEY
+        sync: false
+
+      - key: CLOB_API_SECRET
+        sync: false
+
+      - key: CLOB_API_PASSPHRASE
+        sync: false
+
+      # ── Trading parameters (safe to set here) ────────────────────────────
+      - key: TRADE_AMOUNT_USDC
+        value: "1.0"
+
+      - key: BUY_THRESHOLD
+        value: "0.90"
+
+      - key: STOP_LOSS_PRICE
+        value: "0.85"
+
+      - key: MAX_CONCURRENT_POSITIONS
+        value: "5"
+
+      - key: MAX_TOTAL_EXPOSURE_USDC
+        value: "5.0"
+
+      - key: MARKET_SCAN_INTERVAL
+        value: "120"
+
+      - key: POSITION_MONITOR_INTERVAL
+        value: "20"
+
+      - key: CRICKET_POLL_INTERVAL
+        value: "15"
+
+      # ── Render auto-sets PORT for web services ─────────────────────────
+      - key: PORT
+        value: "8080"
+
+    # Persist DB across deploys
+    disk:
+      name: bot-data
+      mountPath: /app/data
+      sizeGB: 1
